@@ -1,0 +1,40 @@
+# ─────────────────────────────
+# OS
+# ─────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ─────────────────────────────
+# Editor / IDE
+# ─────────────────────────────
+.vscode/
+.idea/
+
+# ─────────────────────────────
+# Logs / Temp
+# ─────────────────────────────
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# ─────────────────────────────
+# Node / Build
+# ─────────────────────────────
+node_modules/
+dist/
+.vite/
+.cache/
+
+# ─────────────────────────────
+# Environment (future proof)
+# ─────────────────────────────
+.env
+.env.local
+
+# ─────────────────────────────
+# Audio / Export (optional later)
+# Uncomment if you start storing test media
+# ─────────────────────────────
+# assets/audio/raw/
+# assets/renders/

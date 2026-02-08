@@ -1,0 +1,70 @@
+#audio-ui {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+
+  padding: 14px 16px;
+  border-radius: 14px;
+
+  background: rgba(0,0,0,0.35);
+  backdrop-filter: blur(12px);
+
+  font-size: 13px;
+  letter-spacing: .04em;
+}
+
+/* ---------- Buttons ---------- */
+
+.ui-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.ui-buttons button {
+  padding: 8px 14px;
+
+  border-radius: 8px;
+  border: none;
+
+  background: rgba(255,255,255,0.08);
+  color: #ddd;
+
+  cursor: pointer;
+  transition: all .18s ease;
+}
+
+.ui-buttons button:hover {
+  background: rgba(255,255,255,0.18);
+}
+
+.ui-buttons button:active {
+  transform: translateY(1px);
+}
+
+/* ---------- Sliders ---------- */
+
+.ui-sliders {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.slider {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.slider label {
+  font-size: 11px;
+  color: rgba(255,255,255,0.6);
+}
+
+.slider input[type="range"] {
+  width: 160px;
+  accent-color: #4aa3ff;
+}
