@@ -75,7 +75,8 @@ void main(){
     float glow =
         smoothstep(0.4, 0.75, nebula);
 
-    glow *= 0.2 + energy * 0.35;
+    glow *= 0.2 + energy * 0.2
+    ;
 
     vec3 background = vec3(0.045,0.048,0.05);
     vec3 cloud      = vec3(0.82,0.84,0.86);
