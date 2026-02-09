@@ -14,3 +14,4 @@ export function setupScene() {
 
   return { scene, camera, renderer };
 }
+
