@@ -36,15 +36,18 @@ const devPanel = document.getElementById("devPanel")
 
 
 // ============================================================
-// DEV PANEL CONTROL
+// DEV PANEL CONTROL (Vercel Safe)
 // ============================================================
 
-// Auto show locally
-if (location.hostname === "localhost") {
+const DEV =
+  location.hostname === "localhost" ||
+  location.search.includes("dev=true")
+
+if (DEV) {
   devPanel?.classList.remove("hidden")
 }
 
-// CTRL + D toggle
+// CTRL+D Toggle
 window.addEventListener("keydown", (e) => {
   if (e.ctrlKey && e.key.toLowerCase() === "d") {
     e.preventDefault()
@@ -101,14 +104,12 @@ ui.fileInput?.addEventListener("change", async (e) => {
     await audio.load(file)
     trackLoaded = true
     console.log("Track loaded:", file.name)
-  }
-  catch(err){
+  } catch(err){
     console.error("Audio load failed:", err)
   }
 
   ui.fileInput.value = ""
 })
-
 
 ui.playBtn?.addEventListener("click", async () => {
   if (!trackLoaded) return
@@ -139,6 +140,7 @@ window.addEventListener("resize", () => {
   )
 })
 
+
 // ============================================================
 // RESPONSE STATE
 // ============================================================
@@ -146,19 +148,21 @@ window.addEventListener("resize", () => {
 const fast = { bass:0, mid:0, high:0, energy:0 }
 const slow = { bass:0, mid:0, high:0, energy:0 }
 
+
 // ============================================================
-// BEAT ENGINE (CINEMATIC SOFT)
+// BEAT ENGINE (Soft Cinematic)
 // ============================================================
 
 let energyAvg = 0
 let beatPulse = 0
 
 const BEAT = {
-  adapt: 0.02,        // moving average speed
-  threshold: 1.35,    // trigger sensitivity
-  decay: 0.92,        // pulse fade
-  boost: 1.2          // pulse strength
+  adapt: 0.02,
+  threshold: 1.35,
+  decay: 0.92,
+  boost: 1.2
 }
+
 
 // ============================================================
 // UI READ
@@ -182,25 +186,21 @@ startLoop(({ time }) => {
 
   material.uniforms.uTime.value = time
 
-  // ---------- AUDIO SAMPLE ----------
   const b = audio.getBass()   || 0
   const m = audio.getMid()    || 0
   const h = audio.getHigh()   || 0
   const e = audio.getEnergy() || 0
 
-  // Moving average
+  // Beat Detection
   energyAvg += (e - energyAvg) * BEAT.adapt
 
-  // Beat trigger
   if (e > energyAvg * BEAT.threshold) {
-  beatPulse = BEAT.boost
-}
+    beatPulse = BEAT.boost
+  }
 
-  // Pulse decay
   beatPulse *= BEAT.decay
 
-
-  // ---------- METERS ----------
+  // UI Meters
   meters.bass && (meters.bass.style.width = (b*100)+"%")
   meters.mid && (meters.mid.style.width = (m*100)+"%")
   meters.high && (meters.high.style.width = (h*100)+"%")
@@ -208,25 +208,25 @@ startLoop(({ time }) => {
 
   const params = readUI()
 
-  // ---------- FAST RESPONSE ----------
+  // Fast
   fast.bass   += (b - fast.bass) * params.fastSmooth
   fast.mid    += (m - fast.mid) * params.fastSmooth
   fast.high   += (h - fast.high) * params.fastSmooth
   fast.energy += (e - fast.energy) * params.fastSmooth
 
-  // ---------- SLOW RESPONSE ----------
+  // Slow
   slow.bass   += (b - slow.bass) * params.slowSmooth
   slow.mid    += (m - slow.mid) * params.slowSmooth
   slow.high   += (h - slow.high) * params.slowSmooth
   slow.energy += (e - slow.energy) * params.slowSmooth
 
-  // ---------- MIX ----------
+  // Mix
   const mixBass   = (slow.bass*0.8 + fast.bass*0.4) * params.gain
   const mixMid    = (slow.mid*0.7  + fast.mid*0.5)  * params.gain
   const mixHigh   = (slow.high*0.6 + fast.high*0.7) * params.gain
   const mixEnergy = (slow.energy*0.7 + fast.energy*0.3) * params.gain
 
-  // ---------- FINAL SMOOTH TO SHADER ----------
+  // Shader Feed
   material.uniforms.uBass.value +=
     (mixBass - material.uniforms.uBass.value) * params.masterSmooth
 
@@ -239,6 +239,7 @@ startLoop(({ time }) => {
   material.uniforms.uEnergy.value +=
     (mixEnergy - material.uniforms.uEnergy.value) * params.masterSmooth
 
+  // Beat Pulse injection
   material.uniforms.uEnergy.value += beatPulse * 0.25
 
   renderer.render(scene, camera)

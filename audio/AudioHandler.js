@@ -150,10 +150,13 @@ getBass() {
   if (!this._updateData()) return 0
 
   let sum = 0
-  for (let i = 0; i < 20; i++)
-    sum += this.data[i]
+  const count = 15
 
-  return (sum / 20) / 255
+  for (let i = 0; i < count; i++) {
+    sum += this.data[i]
+  }
+
+  return Math.min(1.0, (sum / count) / 240)
 }
 
 
@@ -178,10 +181,19 @@ getHigh() {
   if (!this._updateData()) return 0
 
   let sum = 0
-  for (let i = 80; i < 160; i++)
-    sum += this.data[i]
+  const start = 80
+  const end = 200
 
-  return (sum / 80) / 255
+  for (let i = start; i < end; i++) {
+    sum += this.data[i]
+  }
+
+  const norm = (sum / (end - start)) / 255
+
+  return Math.min(
+    1.0,
+    Math.pow(norm * 1.6, 1.2)
+  )
 }
 
 
