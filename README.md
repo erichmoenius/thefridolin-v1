@@ -1,58 +1,78 @@
-Hero Prototype v1 – thefridolin.com
+# Hero Prototype v1 — thefridolin.com
 
-A cinematic, scroll-driven WebGL hero experience built with Three.js and GLSL.
+A cinematic, scroll-driven WebGL hero built with Three.js and GLSL.
 
-Not a visualizer.
-A controlled digital atmosphere.
+This is **not** a typical audio visualizer.  
+It is a controlled digital atmosphere shaped by scroll, subtle audio energy and spatial depth.
 
-🌌 Concept
+---
+
+## 🌌 Experience Concept
+
 A transformation through visual states:
 
-Gas → Water → Solid → Fire → Stillness
+**Gas → Water → Solid → Fire → Stillness**
 
-  Each state evolves physically through scroll.
-  Audio acts as a subtle life layer.
-  Parallax adds presence — never distraction.
+Each state evolves physically through scroll.  
+Audio acts as an internal life layer.  
+Parallax adds spatial presence — never distraction.
 
-Focus:
-  volumetric depth
-  restrained bloom
-  subtle audio response
-  slow camera push-in
-  state blending without hard cuts
+### Core Focus
 
-🎛 Interaction Model
-  Scroll = timeline
-  Audio = internal energy
-  Parallax = spatial response
+- Volumetric depth
+- Restrained cinematic bloom
+- Subtle audio reactivity
+- Slow camera push-in
+- Soft state blending (no hard cuts)
 
-  No gimmicks.
-  No beat-scaling.
-  No flashy transitions.
+---
 
-🧠 Visual Principles
-  Fast-black base (no pure black clipping)
-  Blue / Violet core palette
-  Warm activation only in final Fire state
-  Controlled cinematic bloom
-  No visible noise tiling
-  Modular state blending
+## 🎛 Interaction Model
 
-🛠 Tech Stack
-Core:
-  Three.js
-  Web Audio API
-  GLSL (modular shader structure)
+- **Scroll** → timeline progression  
+- **Audio** → internal energy modulation  
+- **Parallax** → minimal spatial response  
 
-Architecture:
-  Scroll-driven state engine
-  Uniform-based blending
-  Decoupled audio smoothing
+No gimmicks.  
+No beat-scaling.  
+No flashy transitions.
 
-Hosting:
-  Vercel (auto-deploy via GitHub)
+---
 
-📦 Installation
-  npm install
-  npm run dev
-  
+## 🧠 Visual Principles
+
+- Fast-black base (no pure black clipping)
+- Blue / Violet core palette
+- Warm activation only in final *Fire* state
+- Controlled highlight bloom
+- No visible noise tiling
+- Modular shader layering
+
+---
+
+## 🏗 Architecture
+
+- Scroll-driven state engine
+- Uniform-based blending system
+- Decoupled audio smoothing
+- Modular shader structure (no monolithic fragment)
+
+---
+
+## 🛠 Tech Stack
+
+**Core**
+- Three.js
+- Web Audio API
+- GLSL (Vertex & Fragment)
+
+**Deployment**
+- Vercel (auto-deploy via GitHub)
+
+---
+
+## 📦 Installation
+
+```bash
+npm install
+npm run dev
