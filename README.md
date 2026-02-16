@@ -1,19 +1,78 @@
-# Hero Prototype v1 - thefridolin.com
+# Hero Prototype v1 — thefridolin.com
 
-Ein hochperformanter Audio-Visualisierer basierend auf Three.js und GLSL-Shadern.
+A cinematic, scroll-driven WebGL hero built with Three.js and GLSL.
 
-## 🚀 Features
-- **GLSL Nebula Shader:** FBM-basierte (Fractal Brownian Motion) Grafikberechnung direkt auf der GPU.
-- **Web Audio API Integration:** Echtzeit-Analyse von Audio-Frequenzen (Bass, Mids, Highs).
-- **Dual Smoothing:** Organische Bewegungen durch Fast- und Slow-Interpolation der Audio-Daten.
-- **Glassmorphism UI:** Modernes Interface mit Backdrop-Blur und reaktiven Reglern.
+This is **not** a typical audio visualizer.  
+It is a controlled digital atmosphere shaped by scroll, subtle audio energy and spatial depth.
+
+---
+
+## 🌌 Experience Concept
+
+A transformation through visual states:
+
+**Gas → Water → Solid → Fire → Stillness**
+
+Each state evolves physically through scroll.  
+Audio acts as an internal life layer.  
+Parallax adds spatial presence — never distraction.
+
+### Core Focus
+
+- Volumetric depth
+- Restrained cinematic bloom
+- Subtle audio reactivity
+- Slow camera push-in
+- Soft state blending (no hard cuts)
+
+---
+
+## 🎛 Interaction Model
+
+- **Scroll** → timeline progression  
+- **Audio** → internal energy modulation  
+- **Parallax** → minimal spatial response  
+
+No gimmicks.  
+No beat-scaling.  
+No flashy transitions.
+
+---
+
+## 🧠 Visual Principles
+
+- Fast-black base (no pure black clipping)
+- Blue / Violet core palette
+- Warm activation only in final *Fire* state
+- Controlled highlight bloom
+- No visible noise tiling
+- Modular shader layering
+
+---
+
+## 🏗 Architecture
+
+- Scroll-driven state engine
+- Uniform-based blending system
+- Decoupled audio smoothing
+- Modular shader structure (no monolithic fragment)
+
+---
 
 ## 🛠 Tech Stack
-- **Hardware:** Lenovo Legion (AMD Ryzen 7, NVIDIA RTX 4070)
-- **Core:** Three.js, JavaScript (ES6+)
-- **Shaders:** GLSL (Vertex & Fragment)
-- **Hosting:** Vercel (Auto-Deployment via GitHub)
+
+**Core**
+- Three.js
+- Web Audio API
+- GLSL (Vertex & Fragment)
+
+**Deployment**
+- Vercel (auto-deploy via GitHub)
+
+---
 
 ## 📦 Installation
-1. `npm install`
-2. `npm run dev`
+
+```bash
+npm install
+npm run dev
