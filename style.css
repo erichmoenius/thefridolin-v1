@@ -1,3 +1,32 @@
+/* =========================================================
+   GLOBAL RESET
+========================================================= */
+
+html,
+body {
+  margin: 0;
+  width: 100%;
+  min-height: 100%;
+  background: #111;
+  font-family: Inter, system-ui, sans-serif;
+}
+
+
+/* =========================================================
+   HERO ROOT
+========================================================= */
+
+#hero-root {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+}
+
+
+/* =========================================================
+   AUDIO UI PANEL
+========================================================= */
+
 #audio-ui {
   position: absolute;
   top: 20px;
@@ -10,12 +39,17 @@
   padding: 14px 16px;
   border-radius: 14px;
 
-  background: rgba(0,0,0,0.35);
+  background: rgba(0, 0, 0, 0.55);
   backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.08);
 
   font-size: 13px;
   letter-spacing: .04em;
+
+  z-index: 20;
+  isolation: isolate;
 }
+
 
 /* ---------- Buttons ---------- */
 
@@ -31,7 +65,7 @@
   border: none;
 
   background: rgba(255,255,255,0.08);
-  color: #ddd;
+  color: #ffffff;
 
   cursor: pointer;
   transition: all .18s ease;
@@ -44,6 +78,7 @@
 .ui-buttons button:active {
   transform: translateY(1px);
 }
+
 
 /* ---------- Sliders ---------- */
 
@@ -61,10 +96,60 @@
 
 .slider label {
   font-size: 11px;
-  color: rgba(255,255,255,0.6);
+  color: rgba(255,255,255,0.7);
 }
 
 .slider input[type="range"] {
   width: 160px;
   accent-color: #4aa3ff;
+}
+
+
+/* =========================================================
+   DEV PANEL
+========================================================= */
+
+.hidden {
+  display: none !important;
+}
+
+#devPanel {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+
+  padding: 12px 14px;
+  border-radius: 14px;
+
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.08);
+
+  z-index: 30;
+  min-width: 160px;
+
+  isolation: isolate;
+}
+
+.meter label {
+  font-size: 11px;
+  color: rgba(255,255,255,0.7);
+}
+
+.meter-bar {
+  height: 6px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.meter-fill {
+  height: 100%;
+  width: 0%;
+  background: #66ccff;
+  transition: width 0.08s ease-out;
 }

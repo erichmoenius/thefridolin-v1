@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="de">
 <head>
 <meta charset="utf-8" />
@@ -10,124 +9,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
 <link rel="stylesheet" href="./style.css">
-
-<style>
-
-html, body {
-  margin: 0;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  background: #111;
-  font-family: Inter, system-ui, sans-serif;
-}
-
-#hero-root {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-}
-
-/* AUDIO UI */
-
-#audio-ui {
-  position: absolute;
-  top: 20px;
-  left: 20px;
-
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-
-  padding: 14px 16px;
-  border-radius: 14px;
-
-  background: rgba(0,0,0,0.35);
-  backdrop-filter: blur(12px);
-  z-index: 20;
-}
-
-.ui-buttons {
-  display: flex;
-  gap: 8px;
-}
-
-.ui-buttons button {
-  padding: 8px 14px;
-  border-radius: 8px;
-  border: none;
-  background: rgba(255,255,255,0.08);
-  color: #ddd;
-  cursor: pointer;
-  transition: .18s ease;
-}
-
-.ui-buttons button:hover {
-  background: rgba(255,255,255,0.18);
-}
-
-.ui-sliders {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.slider label {
-  font-size: 11px;
-  color: rgba(255,255,255,0.6);
-}
-
-.slider input[type="range"] {
-  width: 160px;
-}
-
-/* DEV PANEL */
-
-.hidden {
-  display: none !important;
-}
-
-#devPanel {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-
-  padding: 12px 14px;
-  border-radius: 14px;
-
-  background: rgba(0,0,0,0.35);
-  backdrop-filter: blur(12px);
-
-  z-index: 30;
-  min-width: 160px;
-}
-
-.meter label {
-  font-size: 11px;
-  color: rgba(255,255,255,0.6);
-}
-
-.meter-bar {
-  height: 6px;
-  background: rgba(255,255,255,0.08);
-  border-radius: 3px;
-  overflow: hidden;
-}
-
-.meter-fill {
-  height: 100%;
-  width: 0%;
-  background: #66ccff;
-  transition: width 0.08s ease-out;
-}
-
-</style>
 
 </head>
 
@@ -135,81 +18,67 @@ html, body {
 
 <div id="hero-root">
 
-  <!-- AUDIO UI -->
-
   <div id="audio-ui">
+    <div class="ui-buttons">
+      <button id="loadBtn">Load</button>
+      <button id="playBtn">Play</button>
+      <button id="pauseBtn">Pause</button>
+      <button id="resetBtn">Reset</button>
+    </div>
 
-```
-<div class="ui-buttons">
-  <button id="loadBtn">Load</button>
-  <button id="playBtn">Play</button>
-  <button id="pauseBtn">Pause</button>
-  <button id="resetBtn">Reset</button>
-</div>
+    <div class="ui-sliders">
+      <div class="slider">
+        <label>Gain</label>
+        <input id="gain" type="range" min="0" max="2" step="0.01" value="1">
+      </div>
 
-<div class="ui-sliders">
+      <div class="slider">
+        <label>FX</label>
+        <input id="fx" type="range" min="0" max="1" step="0.01" value="0.5">
+      </div>
 
-  <div class="slider">
-    <label>Gain</label>
-    <input id="gain" type="range" min="0" max="2" step="0.01" value="1">
+      <div class="slider">
+        <label>Smooth</label>
+        <input id="smooth" type="range" min="0" max="1" step="0.01" value="0.4">
+      </div>
+
+      <div class="slider">
+        <label>Master</label>
+        <input id="master" type="range" min="0" max="1" step="0.01" value="0.6">
+      </div>
+    </div>
+
+    <input id="fileInput" type="file" accept="audio/*" hidden>
   </div>
-
-  <div class="slider">
-    <label>FX</label>
-    <input id="fx" type="range" min="0" max="1" step="0.01" value="0.5">
-  </div>
-
-  <div class="slider">
-    <label>Smooth</label>
-    <input id="smooth" type="range" min="0" max="1" step="0.01" value="0.4">
-  </div>
-
-  <div class="slider">
-    <label>Master</label>
-    <input id="master" type="range" min="0" max="1" step="0.01" value="0.6">
-  </div>
-
-</div>
-
-<input id="fileInput" type="file" accept="audio/*" hidden>
-```
-
-  </div>
-
-  <!-- DEV PANEL -->
 
   <div id="devPanel" class="hidden">
+    <div class="meter">
+      <label>Bass</label>
+      <div class="meter-bar">
+        <div id="meterBass" class="meter-fill"></div>
+      </div>
+    </div>
 
-```
-<div class="meter">
-  <label>Bass</label>
-  <div class="meter-bar">
-    <div id="meterBass" class="meter-fill"></div>
-  </div>
-</div>
+    <div class="meter">
+      <label>Mid</label>
+      <div class="meter-bar">
+        <div id="meterMid" class="meter-fill"></div>
+      </div>
+    </div>
 
-<div class="meter">
-  <label>Mid</label>
-  <div class="meter-bar">
-    <div id="meterMid" class="meter-fill"></div>
-  </div>
-</div>
+    <div class="meter">
+      <label>High</label>
+      <div class="meter-bar">
+        <div id="meterHigh" class="meter-fill"></div>
+      </div>
+    </div>
 
-<div class="meter">
-  <label>High</label>
-  <div class="meter-bar">
-    <div id="meterHigh" class="meter-fill"></div>
-  </div>
-</div>
-
-<div class="meter">
-  <label>Energy</label>
-  <div class="meter-bar">
-    <div id="meterEnergy" class="meter-fill"></div>
-  </div>
-</div>
-```
-
+    <div class="meter">
+      <label>Energy</label>
+      <div class="meter-bar">
+        <div id="meterEnergy" class="meter-fill"></div>
+      </div>
+    </div>
   </div>
 
 </div>

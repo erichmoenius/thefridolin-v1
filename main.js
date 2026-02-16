@@ -1,246 +1,118 @@
-console.log("MAIN LOADED")
+import * as THREE from "three";
+import { setupScene } from "./core/SceneSetup.js";
+import { createNebulaMaterial } from "./graphics/NebulaMaterial.js";
+import { calculateStateWeights } from "./ScrollEngine.js";
 
-import * as THREE from "three"
-import { setupScene } from "./core/SceneSetup.js"
-import { startLoop } from "./core/Loop.js"
-import AudioHandler from "./audio/AudioHandler.js"
-import { createNebulaMaterial } from "./graphics/NebulaMaterial.js"
+// ------------------------------------------------------------
+// BODY RESET
+// ------------------------------------------------------------
 
+document.body.style.margin = "0";
+document.documentElement.style.margin = "0";
 
-// ============================================================
-// UI REFERENCES
-// ============================================================
+// ------------------------------------------------------------
+// SCROLL STAGE
+// ------------------------------------------------------------
 
-const ui = {
-  gain: document.getElementById("gain"),
-  fx: document.getElementById("fx"),
-  smooth: document.getElementById("smooth"),
-  master: document.getElementById("master"),
+let scrollStage = document.getElementById("scroll-stage");
 
-  loadBtn: document.getElementById("loadBtn"),
-  playBtn: document.getElementById("playBtn"),
-  pauseBtn: document.getElementById("pauseBtn"),
-  resetBtn: document.getElementById("resetBtn"),
-
-  fileInput: document.getElementById("fileInput")
+if (!scrollStage) {
+  scrollStage = document.createElement("div");
+  scrollStage.id = "scroll-stage";
+  scrollStage.style.height = "500vh";
+  document.body.appendChild(scrollStage);
 }
 
-const meters = {
-  bass: document.getElementById("meterBass"),
-  mid: document.getElementById("meterMid"),
-  high: document.getElementById("meterHigh"),
-  energy: document.getElementById("meterEnergy")
+function getScrollProgress() {
+  const maxScroll = scrollStage.offsetHeight - window.innerHeight;
+  return Math.min(Math.max(window.scrollY / maxScroll, 0), 1);
 }
 
-const devPanel = document.getElementById("devPanel")
-
-
-// ============================================================
-// DEV PANEL CONTROL (Vercel Safe)
-// ============================================================
-
-const DEV =
-  location.hostname === "localhost" ||
-  location.search.includes("dev=true")
-
-if (DEV) {
-  devPanel?.classList.remove("hidden")
-}
-
-// CTRL+D Toggle
-window.addEventListener("keydown", (e) => {
-  if (e.ctrlKey && e.key.toLowerCase() === "d") {
-    e.preventDefault()
-    devPanel?.classList.toggle("hidden")
-  }
-})
-
-
-// ============================================================
+// ------------------------------------------------------------
 // SCENE SETUP
-// ============================================================
+// ------------------------------------------------------------
 
-const { scene, camera, renderer } = setupScene()
+const { scene, camera, renderer } = setupScene();
 
-document
-  .getElementById("hero-root")
-  .appendChild(renderer.domElement)
+camera.position.z = 1;
+camera.lookAt(0, 0, 0);
 
-camera.position.z = 1
-renderer.setSize(window.innerWidth, window.innerHeight)
+renderer.setPixelRatio(window.devicePixelRatio);
 
+const heroRoot = document.getElementById("hero-root");
 
-// ============================================================
-// NEBULA QUAD
-// ============================================================
+renderer.domElement.style.position = "absolute";
+renderer.domElement.style.inset = "0";
+renderer.domElement.style.zIndex = "0";
 
-const material = createNebulaMaterial()
+heroRoot.appendChild(renderer.domElement);
 
-const quad = new THREE.Mesh(
-  new THREE.PlaneGeometry(2, 2),
-  material
-)
+// ------------------------------------------------------------
+// MATERIAL + QUAD
+// ------------------------------------------------------------
 
-scene.add(quad)
+const geometry = new THREE.PlaneGeometry(2, 2);
+const material = createNebulaMaterial();
 
+const quad = new THREE.Mesh(geometry, material);
+scene.add(quad);
 
-// ============================================================
-// AUDIO SYSTEM
-// ============================================================
-
-const audio = new AudioHandler()
-let trackLoaded = false
-
-ui.loadBtn?.addEventListener("click", () => {
-  ui.fileInput.click()
-})
-
-ui.fileInput?.addEventListener("change", async (e) => {
-
-  const file = e.target.files[0]
-  if (!file) return
-
-  try {
-    await audio.load(file)
-    trackLoaded = true
-    console.log("Track loaded:", file.name)
-  } catch(err){
-    console.error("Audio load failed:", err)
-  }
-
-  ui.fileInput.value = ""
-})
-
-ui.playBtn?.addEventListener("click", async () => {
-  if (!trackLoaded) return
-  try { await audio.play() }
-  catch(err){ console.warn(err.message) }
-})
-
-ui.pauseBtn?.addEventListener("click", () => {
-  if (trackLoaded) audio.pause()
-})
-
-ui.resetBtn?.addEventListener("click", () => {
-  if (trackLoaded) audio.reset()
-})
-
-
-// ============================================================
+// ------------------------------------------------------------
 // RESIZE
-// ============================================================
+// ------------------------------------------------------------
 
-window.addEventListener("resize", () => {
+function resize() {
+  const width = window.innerWidth;
+  const height = window.innerHeight;
 
-  renderer.setSize(window.innerWidth, window.innerHeight)
+  renderer.setSize(width, height);
 
-  material.uniforms.uResolution.value.set(
-    window.innerWidth,
-    window.innerHeight
-  )
-})
-
-
-// ============================================================
-// RESPONSE STATE
-// ============================================================
-
-const fast = { bass:0, mid:0, high:0, energy:0 }
-const slow = { bass:0, mid:0, high:0, energy:0 }
-
-
-// ============================================================
-// BEAT ENGINE (Soft Cinematic)
-// ============================================================
-
-let energyAvg = 0
-let beatPulse = 0
-
-const BEAT = {
-  adapt: 0.02,
-  threshold: 1.35,
-  decay: 0.92,
-  boost: 1.2
+  material.uniforms.uResolution.value.set(width, height);
 }
 
+resize();
+window.addEventListener("resize", resize);
 
-// ============================================================
-// UI READ
-// ============================================================
+// ------------------------------------------------------------
+// MOUSE PARALLAX
+// ------------------------------------------------------------
 
-function readUI(){
-  return {
-    gain: parseFloat(ui.gain?.value ?? 1),
-    fastSmooth: parseFloat(ui.smooth?.value ?? 0.35),
-    slowSmooth: parseFloat(ui.fx?.value ?? 0.05),
-    masterSmooth: parseFloat(ui.master?.value ?? 0.06)
-  }
-}
+let mouse = { x: 0, y: 0 };
+let targetMouse = { x: 0, y: 0 };
 
+window.addEventListener("mousemove", (e) => {
+  targetMouse.x = (e.clientX / window.innerWidth - 0.5);
+  targetMouse.y = (e.clientY / window.innerHeight - 0.5);
+});
 
-// ============================================================
+// ------------------------------------------------------------
 // RENDER LOOP
-// ============================================================
+// ------------------------------------------------------------
 
-startLoop(({ time }) => {
+function animate(time) {
 
-  material.uniforms.uTime.value = time
+  requestAnimationFrame(animate);
 
-  const b = audio.getBass()   || 0
-  const m = audio.getMid()    || 0
-  const h = audio.getHigh()   || 0
-  const e = audio.getEnergy() || 0
+  // Time uniform
+  material.uniforms.uTime.value = time * 0.001;
 
-  // Beat Detection
-  energyAvg += (e - energyAvg) * BEAT.adapt
+  // Smooth mouse interpolation
+  mouse.x += (targetMouse.x - mouse.x) * 0.05;
+  mouse.y += (targetMouse.y - mouse.y) * 0.05;
 
-  if (e > energyAvg * BEAT.threshold) {
-    beatPulse = BEAT.boost
-  }
+  material.uniforms.uMouse.value.set(mouse.x, mouse.y);
 
-  beatPulse *= BEAT.decay
+  // Scroll states
+  const scroll = getScrollProgress();
+  const weights = calculateStateWeights(scroll);
 
-  // UI Meters
-  meters.bass && (meters.bass.style.width = (b*100)+"%")
-  meters.mid && (meters.mid.style.width = (m*100)+"%")
-  meters.high && (meters.high.style.width = (h*100)+"%")
-  meters.energy && (meters.energy.style.width = (e*100)+"%")
+  material.uniforms.uGas.value       = weights.gas;
+  material.uniforms.uWater.value     = weights.water;
+  material.uniforms.uSolid.value     = weights.solid;
+  material.uniforms.uFire.value      = weights.fire;
+  material.uniforms.uStillness.value = weights.stillness;
 
-  const params = readUI()
+  renderer.render(scene, camera);
+}
 
-  // Fast
-  fast.bass   += (b - fast.bass) * params.fastSmooth
-  fast.mid    += (m - fast.mid) * params.fastSmooth
-  fast.high   += (h - fast.high) * params.fastSmooth
-  fast.energy += (e - fast.energy) * params.fastSmooth
-
-  // Slow
-  slow.bass   += (b - slow.bass) * params.slowSmooth
-  slow.mid    += (m - slow.mid) * params.slowSmooth
-  slow.high   += (h - slow.high) * params.slowSmooth
-  slow.energy += (e - slow.energy) * params.slowSmooth
-
-  // Mix
-  const mixBass   = (slow.bass*0.8 + fast.bass*0.4) * params.gain
-  const mixMid    = (slow.mid*0.7  + fast.mid*0.5)  * params.gain
-  const mixHigh   = (slow.high*0.6 + fast.high*0.7) * params.gain
-  const mixEnergy = (slow.energy*0.7 + fast.energy*0.3) * params.gain
-
-  // Shader Feed
-  material.uniforms.uBass.value +=
-    (mixBass - material.uniforms.uBass.value) * params.masterSmooth
-
-  material.uniforms.uMid.value +=
-    (mixMid - material.uniforms.uMid.value) * params.masterSmooth
-
-  material.uniforms.uHigh.value +=
-    (mixHigh - material.uniforms.uHigh.value) * params.masterSmooth
-
-  material.uniforms.uEnergy.value +=
-    (mixEnergy - material.uniforms.uEnergy.value) * params.masterSmooth
-
-  // Beat Pulse injection
-  material.uniforms.uEnergy.value += beatPulse * 0.25
-
-  renderer.render(scene, camera)
-})
+animate();
