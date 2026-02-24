@@ -63,26 +63,17 @@ export default class AudioHandler {
   /* -------------------------------------------------- */
   buildSource(offset = 0) {
 
-    if (!this.buffer) return
+  if (!this.buffer) return;
 
-    if (this.source) {
-      try { this.source.stop() } catch {}
-      this.source.disconnect()
-    }
+  this.source = this.ctx.createBufferSource();
+  this.source.buffer = this.buffer;
+  this.source.loop = true;   // ← FINAL FIX
 
-    this.source = this.ctx.createBufferSource()
-    this.source.buffer = this.buffer
+  this.source.connect(this.analyser);
 
-    // source → analyser
-    this.source.connect(this.analyser)
-
-    this.startTime = this.ctx.currentTime - offset
-
-    this.source.start(0, offset)
-
-    this.source.onended = () => {
-      this.source = null
-    }
+  this.startTime = this.ctx.currentTime - offset;
+  this.source.start(0, offset);
+}
   }
 
   /* -------------------------------------------------- */
