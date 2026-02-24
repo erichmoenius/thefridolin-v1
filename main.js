@@ -149,7 +149,6 @@ window.addEventListener("mousemove", (e) => {
 /* =========================================================
    LOOP
 ========================================================= */
-
 function animate(time) {
   requestAnimationFrame(animate);
 
@@ -159,7 +158,7 @@ function animate(time) {
   if (material.uniforms.uTime)
     material.uniforms.uTime.value = t;
 
-  /* Smooth mouse */
+  /* Smooth mouse (BLEIBT!) */
   mouse.lerp(targetMouse, 0.08);
 
   if (material.uniforms.uMouse)
@@ -181,6 +180,21 @@ function animate(time) {
 
   if (material.uniforms.uEnergy)
     material.uniforms.uEnergy.value = smoothedEnergy;
+
+  /* DEV PANEL METERS (NEU) */
+  const bass = audio.getBass();
+  const mid  = audio.getMid();
+  const high = audio.getHigh();
+
+  const meterBass   = document.getElementById("meterBass");
+  const meterMid    = document.getElementById("meterMid");
+  const meterHigh   = document.getElementById("meterHigh");
+  const meterEnergy = document.getElementById("meterEnergy");
+
+  if (meterBass)   meterBass.style.width   = (bass * 100) + "%";
+  if (meterMid)    meterMid.style.width    = (mid * 100) + "%";
+  if (meterHigh)   meterHigh.style.width   = (high * 100) + "%";
+  if (meterEnergy) meterEnergy.style.width = (rawEnergy * 100) + "%";
 
   renderer.render(scene, camera);
 }
