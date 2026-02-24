@@ -5,7 +5,7 @@ import { calculateStateWeights } from "./ScrollEngine.js";
 import AudioHandler from "./audio/AudioHandler.js";
 
 /* =========================================================
-   BASIC SETUP
+   BASIC
 ========================================================= */
 
 document.body.style.margin = "0";
@@ -14,17 +14,10 @@ document.body.style.margin = "0";
    SCROLL
 ========================================================= */
 
-let scrollStage = document.getElementById("scroll-stage");
-
-if (!scrollStage) {
-  scrollStage = document.createElement("div");
-  scrollStage.id = "scroll-stage";
-  scrollStage.style.height = "500vh";
-  document.body.appendChild(scrollStage);
-}
+document.body.style.height = "500vh";
 
 function getScrollProgress() {
-  const maxScroll = scrollStage.offsetHeight - window.innerHeight;
+  const maxScroll = document.body.scrollHeight - window.innerHeight;
   return Math.min(Math.max(window.scrollY / maxScroll, 0), 1);
 }
 
@@ -33,7 +26,7 @@ function getScrollProgress() {
 ========================================================= */
 
 const audio = new AudioHandler();
-window.audio = audio; // debug
+window.audio = audio;
 
 let smoothedEnergy = 0;
 let trackLoaded = false;
@@ -67,10 +60,6 @@ playBtn?.addEventListener("click", async () => {
   if (!trackLoaded) return;
 
   await audio.initContext();
-  if (audio.ctx.state === "suspended") {
-    await audio.ctx.resume();
-  }
-
   await audio.play();
 });
 
@@ -92,12 +81,12 @@ camera.position.z = 1;
 
 renderer.setPixelRatio(window.devicePixelRatio);
 
-const heroRoot = document.getElementById("hero-root");
-
-renderer.domElement.style.position = "absolute";
+renderer.domElement.style.position = "fixed";
 renderer.domElement.style.inset = "0";
+renderer.domElement.style.pointerEvents = "none"; // IMPORTANT
+renderer.domElement.style.zIndex = "0";
 
-heroRoot.appendChild(renderer.domElement);
+document.body.appendChild(renderer.domElement);
 
 /* =========================================================
    MATERIAL
@@ -106,6 +95,7 @@ heroRoot.appendChild(renderer.domElement);
 const geometry = new THREE.PlaneGeometry(2, 2);
 const material = createNebulaMaterial();
 window.material = material;
+
 const quad = new THREE.Mesh(geometry, material);
 scene.add(quad);
 
@@ -127,6 +117,18 @@ resize();
 window.addEventListener("resize", resize);
 
 /* =========================================================
+   MOUSE PARALLAX
+========================================================= */
+
+let mouse = new THREE.Vector2(0, 0);
+let targetMouse = new THREE.Vector2(0, 0);
+
+window.addEventListener("mousemove", (e) => {
+  targetMouse.x = (e.clientX / window.innerWidth - 0.5);
+  targetMouse.y = (e.clientY / window.innerHeight - 0.5);
+});
+
+/* =========================================================
    LOOP
 ========================================================= */
 
@@ -135,10 +137,17 @@ function animate(time) {
 
   const t = time * 0.001;
 
+  /* Time */
   if (material.uniforms.uTime)
     material.uniforms.uTime.value = t;
 
-  /* Scroll states */
+  /* Smooth mouse */
+  mouse.lerp(targetMouse, 0.08);
+
+  if (material.uniforms.uMouse)
+    material.uniforms.uMouse.value.copy(mouse);
+
+  /* Scroll */
   const scroll = getScrollProgress();
   const weights = calculateStateWeights(scroll);
 
@@ -148,7 +157,7 @@ function animate(time) {
   material.uniforms.uFire.value      = weights.fire;
   material.uniforms.uStillness.value = weights.stillness;
 
-  /* Audio Energy */
+  /* Audio */
   const rawEnergy = audio.getEnergy() || 0;
   smoothedEnergy += (rawEnergy - smoothedEnergy) * 0.05;
 
