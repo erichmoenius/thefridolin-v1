@@ -49,12 +49,12 @@ void main(){
 
     vec2 uv = vUv;
     vec2 p = uv - 0.5;
+    p.x -= uTime * (0.03 + uEnergy * 0.05);  // ← langsames Driften nach links
     p += uMouse * (0.18 + uEnergy * 0.1);
-
 
     p.x *= uResolution.x / uResolution.y;
 
-    float time = uTime * 0.06 + uEnergy * 0.4;
+    float time = uTime * (0.06 + uEnergy * 0.25);
 
     // Base noise
     float n = fbm(p * 3.0 + vec2(time, time * 0.4));
@@ -67,7 +67,7 @@ void main(){
 
     // Increase contrast
     density = pow(density, 1.8);
-    density *= 1.0 + uEnergy * 0.6;
+    density *= 1.0 + uEnergy * 1.4;
 
     // Gentle radial falloff (NOT too strong)
     float radial = length(p);
@@ -84,7 +84,7 @@ void main(){
     nebula = mix(nebula, cyan, density * 0.3);
 
     // Subtle glow only from high density
-    nebula += pow(density, 4.0) * (0.18 + uEnergy * 0.25);
+    nebula += pow(density, 4.0) * (0.18 + uEnergy * 0.6);
 
 // Fire density vorberechnen
 float fireDensity = pow(density, 1.5);
