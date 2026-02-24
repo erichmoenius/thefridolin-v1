@@ -2,8 +2,7 @@ precision highp float;
 
 uniform float uTime;
 uniform vec2  uResolution;
-uniform vec2 uMouse;
-
+uniform vec2  uMouse;
 
 uniform float uGas;
 uniform float uWater;
@@ -13,8 +12,6 @@ uniform float uStillness;
 uniform float uEnergy;
 
 varying vec2 vUv;
-
-// --------------------------------------------------
 
 float hash(vec2 p){
     return fract(sin(dot(p, vec2(127.1,311.7))) * 43758.5453123);
@@ -43,38 +40,34 @@ float fbm(vec2 p){
     return v;
 }
 
-// --------------------------------------------------
-
 void main(){
 
     vec2 uv = vUv;
     vec2 p = uv - 0.5;
-    p.x -= uTime * (0.03 + uEnergy * 0.05);  // ← langsames Driften nach links
-    p += uMouse * (0.18 + uEnergy * 0.1);
 
+    // Aspect correction FIRST
     p.x *= uResolution.x / uResolution.y;
 
-    float time = uTime * (0.06 + uEnergy * 0.25);
+    // Smooth left drift (center safe)
+    p.x -= uTime * 0.025;
 
-    // Base noise
+    // Parallax
+    p += uMouse * (0.18 + uEnergy * 0.15);
+
+    float time = uTime * (0.06 + uEnergy * 0.35);
+
     float n = fbm(p * 3.0 + vec2(time, time * 0.4));
-
-    // Secondary detail layer
     float detail = fbm(p * 6.0 - vec2(time * 0.3));
 
-    // Combine layers for richer structure
     float density = mix(n, detail, 0.5);
-
-    // Increase contrast
     density = pow(density, 1.8);
-    density *= 1.0 + uEnergy * 1.4;
 
-    // Gentle radial falloff (NOT too strong)
+    density *= 1.0 + uEnergy * 1.6;
+
     float radial = length(p);
     float depthMask = smoothstep(1.0, 0.2, radial);
     density *= depthMask;
 
-    // Color palette
     vec3 deepBlue = vec3(0.02, 0.05, 0.12);
     vec3 violet   = vec3(0.4, 0.08, 0.6);
     vec3 cyan     = vec3(0.1, 0.6, 0.9);
@@ -83,22 +76,16 @@ void main(){
     vec3 nebula = mix(deepBlue, violet, density);
     nebula = mix(nebula, cyan, density * 0.3);
 
-    // Subtle glow only from high density
-    nebula += pow(density, 4.0) * (0.18 + uEnergy * 0.6);
+    nebula += pow(density, 4.0) * (0.18 + uEnergy * 0.7);
 
-// Fire density vorberechnen
-float fireDensity = pow(density, 1.5);
+    float fireDensity = pow(density, 1.5);
 
-// State blending
-vec3 finalColor =
-      uGas       * nebula
-    + uWater     * mix(nebula, cyan, 0.5)
-    + uSolid     * mix(nebula, vec3(0.6), 0.4)
-    + uFire      * (
-        nebula * 1.2 +
-        fireDensity * orange * 0.8
-      )
-    + uStillness * deepBlue;
+    vec3 finalColor =
+          uGas       * nebula
+        + uWater     * mix(nebula, cyan, 0.5)
+        + uSolid     * mix(nebula, vec3(0.6), 0.4)
+        + uFire      * (nebula * 1.2 + fireDensity * orange * 0.8)
+        + uStillness * deepBlue;
 
     gl_FragColor = vec4(finalColor, 1.0);
 }
