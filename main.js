@@ -72,6 +72,21 @@ resetBtn?.addEventListener("click", () => {
 });
 
 /* =========================================================
+   DEV PANEL TOGGLE (CTRL + D)
+========================================================= */
+
+window.addEventListener("keydown", (e) => {
+  if (e.ctrlKey && e.key.toLowerCase() === "d") {
+    e.preventDefault();
+
+    const panel = document.getElementById("devPanel");
+    if (panel) {
+      panel.classList.toggle("hidden");
+    }
+  }
+});
+
+/* =========================================================
    SCENE
 ========================================================= */
 
