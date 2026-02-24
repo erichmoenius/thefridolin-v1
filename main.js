@@ -105,6 +105,7 @@ heroRoot.appendChild(renderer.domElement);
 
 const geometry = new THREE.PlaneGeometry(2, 2);
 const material = createNebulaMaterial();
+window.material = material;
 const quad = new THREE.Mesh(geometry, material);
 scene.add(quad);
 
