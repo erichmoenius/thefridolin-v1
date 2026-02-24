@@ -81,12 +81,15 @@ camera.position.z = 1;
 
 renderer.setPixelRatio(window.devicePixelRatio);
 
-renderer.domElement.style.position = "fixed";
+// Canvas styling
+renderer.domElement.style.position = "absolute";
 renderer.domElement.style.inset = "0";
-renderer.domElement.style.pointerEvents = "none"; // IMPORTANT
+renderer.domElement.style.pointerEvents = "none"; // wichtig für Parallax
 renderer.domElement.style.zIndex = "0";
 
-document.body.appendChild(renderer.domElement);
+// Canvas in hero-root einfügen (NICHT body!)
+const heroRoot = document.getElementById("hero-root");
+heroRoot.appendChild(renderer.domElement);
 
 /* =========================================================
    MATERIAL
