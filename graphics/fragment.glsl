@@ -49,7 +49,7 @@ void main(){
     p.x *= uResolution.x / uResolution.y;
 
     // Smooth left drift (center safe)
-    p.x += sin(uTime * 0.2) * -0.5;
+    p.x += sin(uTime * 0.2) * 0.5;
 
     // Parallax
     p += uMouse * (0.18 + uEnergy * 0.15);
