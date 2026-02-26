@@ -9,9 +9,16 @@ uniform float uWater;
 uniform float uSolid;
 uniform float uFire;
 uniform float uStillness;
+
 uniform float uEnergy;
+uniform float uFX;
+uniform float uMaster;
 
 varying vec2 vUv;
+
+/* ===========================
+   NOISE
+=========================== */
 
 float hash(vec2 p){
     return fract(sin(dot(p, vec2(127.1,311.7))) * 43758.5453123);
@@ -40,18 +47,22 @@ float fbm(vec2 p){
     return v;
 }
 
+/* ===========================
+   MAIN
+=========================== */
+
 void main(){
 
     vec2 uv = vUv;
     vec2 p = uv - 0.5;
 
-    // Aspect correction FIRST
+    /* Aspect correction FIRST */
     p.x *= uResolution.x / uResolution.y;
 
-    // Smooth left drift (center safe)
-    p.x += sin(uTime * 0.2) * 0.5;
+    /* Smooth center-safe drift */
+    p.x += sin(uTime * 0.2) * 0.25;
 
-    // Parallax
+    /* Parallax */
     p += uMouse * (0.18 + uEnergy * 0.15);
 
     float time = uTime * (0.06 + uEnergy * 0.35);
@@ -62,12 +73,13 @@ void main(){
     float density = mix(n, detail, 0.5);
     density = pow(density, 1.8);
 
-    density *= 1.0 + uEnergy * 1.6;
+    density *= 1.0 + uEnergy * (1.0 + uFX * 2.0);
 
     float radial = length(p);
     float depthMask = smoothstep(1.0, 0.2, radial);
     density *= depthMask;
 
+    /* Palette */
     vec3 deepBlue = vec3(0.02, 0.05, 0.12);
     vec3 violet   = vec3(0.4, 0.08, 0.6);
     vec3 cyan     = vec3(0.1, 0.6, 0.9);
@@ -76,7 +88,8 @@ void main(){
     vec3 nebula = mix(deepBlue, violet, density);
     nebula = mix(nebula, cyan, density * 0.3);
 
-    nebula += pow(density, 4.0) * (0.18 + uEnergy * 0.7);
+    nebula += pow(density, 4.0) *
+              (0.18 + uEnergy * (0.6 + uFX * 1.2));
 
     float fireDensity = pow(density, 1.5);
 
@@ -84,8 +97,14 @@ void main(){
           uGas       * nebula
         + uWater     * mix(nebula, cyan, 0.5)
         + uSolid     * mix(nebula, vec3(0.6), 0.4)
-        + uFire      * (nebula * 1.2 + fireDensity * orange * 0.8)
+        + uFire      * (
+              nebula * 1.0 +
+              fireDensity * orange * (1.4 + uFX * 1.2)
+          )
         + uStillness * deepBlue;
+
+    /* Master control */
+    finalColor *= uMaster;
 
     gl_FragColor = vec4(finalColor, 1.0);
 }

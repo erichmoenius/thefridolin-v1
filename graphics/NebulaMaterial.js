@@ -37,7 +37,9 @@ export function createNebulaMaterial() {
        AUDIO
     ================================= */
 
-    uEnergy:    { value: 0.0 }
+    uEnergy: { value: 0.0 },
+    uFX:     { value: 0.5 },
+    uMaster: { value: 0.6 }
 
   };
 
