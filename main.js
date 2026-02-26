@@ -38,6 +38,7 @@ const resetBtn  = document.getElementById("resetBtn");
 const fileInput = document.getElementById("fileInput");
 
 const gainSlider = document.getElementById("gain");
+const smoothSlider = document.getElementById("smooth");
 
 gainSlider?.addEventListener("input", (e) => {
   const value = parseFloat(e.target.value);
@@ -198,7 +199,10 @@ const gainValue = parseFloat(gainSlider?.value || 1);
 const visualEnergy = rawEnergy * gainValue;
 
 // Smooth Faktor (kann später vom Smooth-Slider kommen)
-const smoothFactor = 0.05;
+const smoothValue = parseFloat(smoothSlider?.value || 0.4);
+
+// Mapping: Slider 0–1 → smoothing 0.01–0.25
+const smoothFactor = 0.01 + smoothValue * 0.24;
 
 smoothedEnergy += (visualEnergy - smoothedEnergy) * smoothFactor;
 
