@@ -37,6 +37,16 @@ const pauseBtn  = document.getElementById("pauseBtn");
 const resetBtn  = document.getElementById("resetBtn");
 const fileInput = document.getElementById("fileInput");
 
+const gainSlider = document.getElementById("gain");
+
+gainSlider?.addEventListener("input", (e) => {
+  const value = parseFloat(e.target.value);
+
+  if (audio.gainNode) {
+    audio.gainNode.gain.value = value;
+  }
+});  
+
 loadBtn?.addEventListener("click", () => {
   fileInput.click();
 });
@@ -175,11 +185,29 @@ function animate(time) {
   material.uniforms.uStillness.value = weights.stillness;
 
   /* Audio */
-  const rawEnergy = audio.getEnergy() || 0;
-  smoothedEnergy += (rawEnergy - smoothedEnergy) * 0.05;
+  /* -----------------------
+   Audio → Visual Energy
+----------------------- */
 
-  if (material.uniforms.uEnergy)
-    material.uniforms.uEnergy.value = smoothedEnergy;
+const rawEnergy = audio.getEnergy() || 0;
+
+// Gain beeinflusst visuelle Stärke
+const gainValue = parseFloat(gainSlider?.value || 1);
+
+// Visuelle Energie
+const visualEnergy = rawEnergy * gainValue;
+
+// Smooth Faktor (kann später vom Smooth-Slider kommen)
+const smoothFactor = 0.05;
+
+smoothedEnergy += (visualEnergy - smoothedEnergy) * smoothFactor;
+
+// Begrenzen (optional, aber sauber)
+smoothedEnergy = Math.min(smoothedEnergy, 2.0);
+
+if (material.uniforms.uEnergy) {
+  material.uniforms.uEnergy.value = smoothedEnergy;
+}
 
   /* DEV PANEL METERS (NEU) */
   const bass = audio.getBass();
