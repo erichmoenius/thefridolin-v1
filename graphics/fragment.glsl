@@ -56,30 +56,60 @@ void main(){
     vec2 uv = vUv;
     vec2 p = uv - 0.5;
 
-    /* Aspect correction FIRST */
+    /* Aspect correction */
     p.x *= uResolution.x / uResolution.y;
 
-    // Ultra slow cosmic drift
-    p.x += sin(uTime * 0.08) * 0.15;
+    /* ===========================
+       CINEMATIC MOTION
+    =========================== */
+
+    /* Slow oscillating drift (center safe) */
+    p.x += sin(uTime * 0.05) * 0.08;
+    p.y += cos(uTime * 0.04) * 0.06;
+
+    /* Very slow centered rotation */
+    float angle = sin(uTime * 0.03) * 0.15;
+
+    mat2 rot = mat2(
+        cos(angle), -sin(angle),
+        sin(angle),  cos(angle)
+    );
+
+    p = rot * p;
 
     /* Parallax */
     p += uMouse * (0.18 + uEnergy * 0.15);
 
+    /* Time modulation */
     float time = uTime * (0.06 + uEnergy * 0.35);
+
+    /* ===========================
+       STRUCTURE
+    =========================== */
 
     float n = fbm(p * 3.0 + vec2(time, time * 0.4));
     float detail = fbm(p * 6.0 - vec2(time * 0.3));
 
     float density = mix(n, detail, 0.5);
-    density = pow(density, 1.8);
 
-    density *= 1.0 + uEnergy * (1.0 + uFX * 2.0);
+    /* Depth modulation (multiplicative = keeps structure) */
+    float depthLayer = fbm(p * 1.2 - uTime * 0.02);
+    density *= 1.0 + depthLayer * 0.25;
 
+    density = pow(density, 1.75);
+
+    /* FX amplification */
+    density *= 1.0 + uEnergy * mix(0.8, 3.0, uFX);
+
+    /* Radial falloff */
     float radial = length(p);
     float depthMask = smoothstep(1.0, 0.2, radial);
     density *= depthMask;
 
-    /* Palette */
+    /* ===========================
+       PALETTE
+    =========================== */
+
     vec3 deepBlue = vec3(0.02, 0.05, 0.12);
     vec3 violet   = vec3(0.4, 0.08, 0.6);
     vec3 cyan     = vec3(0.1, 0.6, 0.9);
@@ -88,7 +118,7 @@ void main(){
     vec3 nebula = mix(deepBlue, violet, density);
     nebula = mix(nebula, cyan, density * 0.3);
 
-    // Softer cinematic glow
+    /* Soft cinematic glow */
     nebula += pow(density, 3.0) *
               (0.12 + uEnergy * (0.4 + uFX * 0.6));
 
@@ -99,13 +129,13 @@ void main(){
         + uWater     * mix(nebula, cyan, 0.5)
         + uSolid     * mix(nebula, vec3(0.6), 0.4)
         + uFire      * (
-              nebula * 1.0 +
+              nebula +
               fireDensity * orange * (1.4 + uFX * 1.2)
           )
         + uStillness * deepBlue;
 
-    /* Master control */
-    finalColor *= uMaster;
+    /* Master exposure control */
+    finalColor = mix(finalColor * 0.5, finalColor, uMaster);
 
     gl_FragColor = vec4(finalColor, 1.0);
 }

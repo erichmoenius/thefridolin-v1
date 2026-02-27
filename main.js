@@ -179,7 +179,7 @@ function animate(time) {
   const visualEnergy = compressed * gainValue;
 
   const smoothValue = parseFloat(smoothSlider?.value || 0.4);
-  const smoothFactor = 0.005 + smoothValue * 0.12;
+  const smoothFactor = 0.003 + smoothValue * 0.08;
 
   smoothedEnergy += (visualEnergy - smoothedEnergy) * smoothFactor;
   smoothedEnergy = Math.min(smoothedEnergy, 2.0);
