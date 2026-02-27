@@ -59,8 +59,8 @@ void main(){
     /* Aspect correction FIRST */
     p.x *= uResolution.x / uResolution.y;
 
-    /* Smooth center-safe drift */
-    p.x += sin(uTime * 0.2) * 0.25;
+    // Ultra slow cosmic drift
+    p.x += sin(uTime * 0.08) * 0.15;
 
     /* Parallax */
     p += uMouse * (0.18 + uEnergy * 0.15);
@@ -88,8 +88,9 @@ void main(){
     vec3 nebula = mix(deepBlue, violet, density);
     nebula = mix(nebula, cyan, density * 0.3);
 
-    nebula += pow(density, 4.0) *
-              (0.18 + uEnergy * (0.6 + uFX * 1.2));
+    // Softer cinematic glow
+    nebula += pow(density, 3.0) *
+              (0.12 + uEnergy * (0.4 + uFX * 0.6));
 
     float fireDensity = pow(density, 1.5);
 

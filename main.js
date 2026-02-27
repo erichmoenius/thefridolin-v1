@@ -173,13 +173,13 @@ function animate(time) {
   const rawEnergy = audio.getEnergy() || 0;
 
   // leichte Kompression → weniger Zappeln
-  const compressed = Math.pow(rawEnergy, 0.6);
+  const compressed = Math.pow(rawEnergy, 0.4);
 
   const gainValue = parseFloat(gainSlider?.value || 1);
   const visualEnergy = compressed * gainValue;
 
   const smoothValue = parseFloat(smoothSlider?.value || 0.4);
-  const smoothFactor = 0.01 + smoothValue * 0.24;
+  const smoothFactor = 0.005 + smoothValue * 0.12;
 
   smoothedEnergy += (visualEnergy - smoothedEnergy) * smoothFactor;
   smoothedEnergy = Math.min(smoothedEnergy, 2.0);
